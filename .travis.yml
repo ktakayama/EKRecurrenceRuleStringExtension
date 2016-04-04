@@ -1,0 +1,10 @@
+language: objective-c
+osx_image: xcode7.3
+env:
+    - DESTINATION="OS=9.3,name=iPhone 6" SCHEME="EKRecurrenceRuleStringExtension" SDK="iphonesimulator9.3"
+before_install:
+    - gem install xcpretty --no-rdoc --no-ri --no-document --quiet
+script:
+    - set -o pipefail
+    - xcodebuild -version
+    - xcodebuild -project EKRecurrenceRuleStringExtension.xcodeproj -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO test | xcpretty -c
