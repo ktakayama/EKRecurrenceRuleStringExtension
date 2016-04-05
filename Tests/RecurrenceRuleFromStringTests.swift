@@ -19,6 +19,7 @@ class RecurrenceRuleFromStringTests: XCTestCase {
 
     func testRecurrenceRulesWeekly() {
        __testRecurrenceRulePattern("RRULE FREQ=WEEKLY;INTERVAL=2;BYDAY=TU,SU;WKST=SU")
+       __testRecurrenceRulePattern("RRULE FREQ=WEEKLY;INTERVAL=1;COUNT=3;BYDAY=SU,MO")
     }
 
     func testRecurrenceRulesMonthly() {

@@ -75,6 +75,10 @@ struct RecurrenceParser {
                return EKRecurrenceEnd(endDate:recurrenceEndDate)
             }
          }
+      } else {
+         if let count = (processRegexp("COUNT=([\\d,-]*)") as [NSNumber]?)?.first {
+            return EKRecurrenceEnd(occurrenceCount:count.integerValue)
+         }
       }
 
       return nil
