@@ -57,7 +57,6 @@ struct RecurrenceParser {
       } else if self.ruleString.containsString("FREQ=YEARLY") {
          return .Yearly
       } else {
-         print("[RRULE] invalid format: %", self.ruleString)
          return nil
       }
    }
