@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "EKRecurrenceRuleStringExtension"
-  s.version          = "1.0.0"
+  s.version          = "1.0.1"
   s.summary          = "EKRecurrenceRule extension in swift"
   s.homepage         = "https://github.com/ktakayama/EKRecurrenceRuleStringExtension"
   s.license          = { :type => "MIT", :file => "LICENSE" }
