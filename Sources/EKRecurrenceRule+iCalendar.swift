@@ -13,7 +13,7 @@ public extension EKRecurrenceRule {
 
     public func stringForICalendar() -> String {
         let ret = self.description
-        return "RRULE " + ret.componentsSeparatedByString(" RRULE ")[1]
+        return "RRULE " + ret.components(separatedBy: " RRULE ")[1]
     }
 
 }

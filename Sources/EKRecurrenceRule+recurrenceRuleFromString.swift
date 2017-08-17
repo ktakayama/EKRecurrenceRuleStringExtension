@@ -11,14 +11,14 @@ import EventKit
 
 public extension EKRecurrenceRule {
 
-   public class func recurrenceRuleFromString(ruleString: String) -> EKRecurrenceRule? {
+   public class func recurrenceRuleFromString(_ ruleString: String) -> EKRecurrenceRule? {
       let parser = RecurrenceParser(ruleString: NSString(string: ruleString))
 
       guard let type = parser.type else {
          return nil
       }
 
-      return self.init(recurrenceWithFrequency:type,
+      return self.init(recurrenceWith:type,
          interval:parser.interval,
          daysOfTheWeek:parser.days,
          daysOfTheMonth:parser.monthDays,
@@ -36,10 +36,10 @@ struct RecurrenceParser {
    let ruleString: NSString
 
    var interval: Int {
-      let intervalArray = self.ruleString.componentsSeparatedByString("INTERVAL=")
+      let intervalArray = self.ruleString.components(separatedBy: "INTERVAL=")
 
       if intervalArray.count > 1 {
-         if let intervalString = intervalArray.last?.componentsSeparatedByString(";").first {
+         if let intervalString = intervalArray.last?.components(separatedBy: ";").first {
             return Int(intervalString) ?? 1
          }
       }
@@ -48,35 +48,35 @@ struct RecurrenceParser {
    }
 
    var type: EKRecurrenceFrequency? {
-      if self.ruleString.containsString("FREQ=DAILY") {
-         return .Daily
-      } else if self.ruleString.containsString("FREQ=WEEKLY") {
-         return .Weekly
-      } else if self.ruleString.containsString("FREQ=MONTHLY") {
-         return .Monthly
-      } else if self.ruleString.containsString("FREQ=YEARLY") {
-         return .Yearly
+      if self.ruleString.contains("FREQ=DAILY") {
+         return .daily
+      } else if self.ruleString.contains("FREQ=WEEKLY") {
+         return .weekly
+      } else if self.ruleString.contains("FREQ=MONTHLY") {
+         return .monthly
+      } else if self.ruleString.contains("FREQ=YEARLY") {
+         return .yearly
       } else {
          return nil
       }
    }
 
    var end: EKRecurrenceEnd? {
-      let untilArray = self.ruleString.componentsSeparatedByString("UNTIL=")
+      let untilArray = self.ruleString.components(separatedBy: "UNTIL=")
 
       if untilArray.count > 1 {
-         if let recurrenceEndDateString = untilArray.last!.componentsSeparatedByString(";").first {
-            let recurrenceDateFormatter = NSDateFormatter()
-            recurrenceDateFormatter.locale = NSLocale(localeIdentifier:"US")
-            recurrenceDateFormatter.timeZone = NSTimeZone(name:"UTC")
+         if let recurrenceEndDateString = untilArray.last!.components(separatedBy: ";").first {
+            let recurrenceDateFormatter = DateFormatter()
+            recurrenceDateFormatter.locale = Locale(identifier:"US")
+            recurrenceDateFormatter.timeZone = TimeZone(identifier:"UTC")
             recurrenceDateFormatter.dateFormat = "yyyyMMdd'T'HHmmss'Z'"
-            if let recurrenceEndDate = recurrenceDateFormatter.dateFromString(recurrenceEndDateString) {
-               return EKRecurrenceEnd(endDate:recurrenceEndDate)
+            if let recurrenceEndDate = recurrenceDateFormatter.date(from: recurrenceEndDateString) {
+               return EKRecurrenceEnd(end:recurrenceEndDate)
             }
          }
       } else {
          if let count = (processRegexp("COUNT=([\\d,-]*)") as [NSNumber]?)?.first {
-            return EKRecurrenceEnd(occurrenceCount:count.integerValue)
+            return EKRecurrenceEnd(occurrenceCount:count.intValue)
          }
       }
 
@@ -96,20 +96,20 @@ struct RecurrenceParser {
          var weekNumber = -1
 
          if byday.length > 2 {
-            weekNumber = Int(byday.substringWithRange(NSRange(location:0, length:byday.length-2))) ?? -1
-            week = byday.substringWithRange(NSRange(location:byday.length-2, length:2))
+            weekNumber = Int(byday.substring(with: NSRange(location:0, length:byday.length-2))) ?? -1
+            week = byday.substring(with: NSRange(location:byday.length-2, length:2)) as NSString
          }
 
          var dofw: EKWeekday?
 
          switch week {
-            case "MO": dofw = .Monday
-            case "TU": dofw = .Tuesday
-            case "WE": dofw = .Wednesday
-            case "TH": dofw = .Thursday
-            case "FR": dofw = .Friday
-            case "SA": dofw = .Saturday
-            case "SU": dofw = .Sunday
+            case "MO": dofw = .monday
+            case "TU": dofw = .tuesday
+            case "WE": dofw = .wednesday
+            case "TH": dofw = .thursday
+            case "FR": dofw = .friday
+            case "SA": dofw = .saturday
+            case "SU": dofw = .sunday
             default: dofw = nil
          }
 
@@ -147,21 +147,21 @@ struct RecurrenceParser {
       return processRegexp("BYSETPOS=([\\d,-]*)")
    }
 
-   private func processRegexp(regexString: String) -> [NSString]? {
-      let reg = try? NSRegularExpression(pattern:regexString, options:.CaseInsensitive)
-      if let match = reg?.firstMatchInString(String(self.ruleString),
-                                           options:.ReportProgress,
+   fileprivate func processRegexp(_ regexString: String) -> [NSString]? {
+      let reg = try? NSRegularExpression(pattern:regexString, options:.caseInsensitive)
+      if let match = reg?.firstMatch(in: String(self.ruleString),
+                                           options:.reportProgress,
                                            range:NSRange(location:0, length:self.ruleString.length)) {
-         return self.ruleString.substringWithRange(match.rangeAtIndex(1)).componentsSeparatedByString(",")
+         return self.ruleString.substring(with: match.rangeAt(1)).components(separatedBy: ",") as [NSString]?
       }
       return nil
    }
 
-   private func processRegexp(regexString: String) -> [NSNumber]? {
+   fileprivate func processRegexp(_ regexString: String) -> [NSNumber]? {
       guard let results: [NSString] = processRegexp(regexString) else {
          return nil
       }
-      return results.map { Int($0.intValue) }
+      return results.map { NSNumber(value: $0.intValue) }
    }
 
 }
